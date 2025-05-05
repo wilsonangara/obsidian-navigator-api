@@ -1,0 +1,6 @@
+# npm
+node_modules/
+
+# Exclude compiled output file from build.
+# This will be uploaded in github releases instead.
+main.js
