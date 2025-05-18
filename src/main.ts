@@ -1,6 +1,7 @@
 import { Plugin } from "obsidian";
 import Fastify, { FastifyInstance } from "fastify";
 import WorkspaceHandler from "./handlers/workspace";
+import ContextService from "./context";
 
 export default class ObsidianNavigatorAPI extends Plugin {
   public port: number = 27124;
@@ -20,9 +21,13 @@ export default class ObsidianNavigatorAPI extends Plugin {
       },
     );
 
-    // register handlers
-    const workspaceHandler = new WorkspaceHandler(this.app);
+    // context
+    const context = new ContextService(this.app);
 
+    // register handlers
+    const workspaceHandler = new WorkspaceHandler(context);
+
+    // endpoints
     this.fastify.register(workspaceHandler.routes, { prefix: "/workspace" });
 
     this.fastify.listen({ port: this.port }, (err, address) => {

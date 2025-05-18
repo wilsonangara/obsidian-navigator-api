@@ -3,13 +3,13 @@
  * in Obsidian.
  */
 import { FastifyInstance } from "fastify";
-import { App, Workspace } from "obsidian";
+import { IContextService } from "src/context";
 
 export default class WorkspaceHandler {
-  private workspace: Workspace;
+  private context: IContextService;
 
-  constructor(private app: App) {
-    this.workspace = app.workspace;
+  constructor(context: IContextService) {
+    this.context = context;
   }
 
   public routes = (fastify: FastifyInstance, opts: Object) => {
@@ -55,7 +55,7 @@ export default class WorkspaceHandler {
         const { filepath } = request.body;
 
         try {
-          await this.workspace.openLinkText(filepath, "/", false);
+          await this.context.workspace.openLinkText(filepath, "/", false);
           reply.status(200).send({ message: "ok" });
         } catch (err) {
           reply.status(500).send({ error: err.message });
