@@ -55,7 +55,15 @@ export default class WorkspaceHandler {
         const { filepath } = request.body;
 
         try {
+          // opens file based on the filepath.
           await this.context.workspace.openLinkText(filepath, "/", false);
+
+          // gets the active open editor instance.
+          const activeEditor = this.context.workspace.activeEditor;
+          if (activeEditor && activeEditor.editor) {
+            this.context.setEditor(activeEditor.editor);
+          }
+
           reply.status(200).send({ message: "ok" });
         } catch (err) {
           reply.status(500).send({ error: err.message });
