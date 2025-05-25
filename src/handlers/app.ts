@@ -61,7 +61,6 @@ export default class AppHandler {
         schema: {
           body: {
             type: "object",
-            required: ["filepath"],
             properties: {
               id: {
                 type: "string",
