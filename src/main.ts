@@ -1,8 +1,13 @@
 import { Plugin } from "obsidian";
 import Fastify, { FastifyInstance } from "fastify";
-import WorkspaceHandler from "./handlers/workspace";
+
+// Services
 import ContextService from "./context";
+
+// Handlers
 import AppHandler from "./handlers/app";
+import WorkspaceHandler from "./handlers/workspace";
+import DailyNotesHandler from "./handlers/daily-notes";
 
 export default class ObsidianNavigatorAPI extends Plugin {
   public port: number = 27124;
@@ -28,10 +33,12 @@ export default class ObsidianNavigatorAPI extends Plugin {
     // register handlers
     const appHandler = new AppHandler(context);
     const workspaceHandler = new WorkspaceHandler(context);
+    const dailyNotesHandler = new DailyNotesHandler(context);
 
     // endpoints
     this.fastify.register(appHandler.routes, { prefix: "/app" });
     this.fastify.register(workspaceHandler.routes, { prefix: "/workspace" });
+    this.fastify.register(dailyNotesHandler.routes, { prefix: "/daily-notes" });
 
     this.fastify.listen({ port: this.port }, (err, address) => {
       if (err) {
