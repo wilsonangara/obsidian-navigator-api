@@ -65,7 +65,6 @@ export default class AppHandler {
             properties: {
               id: {
                 type: "string",
-                describe: "Command ID from `{GET} /app/commands",
               },
             },
           },
