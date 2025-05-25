@@ -3,6 +3,7 @@
  * in Obsidian.
  */
 import { FastifyInstance } from "fastify";
+import { MarkdownView } from "obsidian";
 import { IContextService } from "src/context";
 
 export default class WorkspaceHandler {
@@ -70,5 +71,29 @@ export default class WorkspaceHandler {
         }
       },
     );
+
+    /**
+     * Goes to the next tab if there is one.
+     */
+    fastify.post("/tabs/next", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("workspace:next-tab");
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
+
+    /**
+     * Goes to the previous tab if there is one.
+     */
+    fastify.post("/tabs/prev", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("workspace:previous-tab");
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
   };
 }
