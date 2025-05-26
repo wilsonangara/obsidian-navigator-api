@@ -10,7 +10,7 @@ export interface IContextService {
   readonly workspace: Workspace;
   setWorkspace(workspace: Workspace): void;
 
-  readonly editor: Editor;
+  readonly editor: Editor | null | undefined;
   setEditor(editor: Editor): void;
 }
 

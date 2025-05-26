@@ -8,6 +8,7 @@ import ContextService from "./context";
 import AppHandler from "./handlers/app";
 import WorkspaceHandler from "./handlers/workspace";
 import DailyNotesHandler from "./handlers/daily-notes";
+import EditorHandler from "./handlers/editor";
 
 export default class ObsidianNavigatorAPI extends Plugin {
   public port: number = 27124;
@@ -34,11 +35,13 @@ export default class ObsidianNavigatorAPI extends Plugin {
     const appHandler = new AppHandler(context);
     const workspaceHandler = new WorkspaceHandler(context);
     const dailyNotesHandler = new DailyNotesHandler(context);
+    const editorHandler = new EditorHandler(context);
 
     // endpoints
     this.fastify.register(appHandler.routes, { prefix: "/app" });
     this.fastify.register(workspaceHandler.routes, { prefix: "/workspace" });
     this.fastify.register(dailyNotesHandler.routes, { prefix: "/daily-notes" });
+    this.fastify.register(editorHandler.routes, { prefix: "/editor" });
 
     this.fastify.listen({ port: this.port }, (err, address) => {
       if (err) {
