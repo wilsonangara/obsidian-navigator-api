@@ -56,6 +56,7 @@ export default class WorkspaceHandler {
         const { filepath } = request.body;
 
         try {
+          console.log(filepath, "FILEPATH");
           // opens file based on the filepath.
           await this.context.workspace.openLinkText(filepath, "/", false);
 
@@ -71,6 +72,42 @@ export default class WorkspaceHandler {
         }
       },
     );
+
+    /**
+     * Opens a new tab.
+     */
+    fastify.post("/tabs/new", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("workspace:new-tab");
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
+
+    /**
+     * Close current tab.
+     */
+    fastify.post("/tabs/close", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("workspace:close");
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
+
+    /**
+     * Close all other tabs except current.
+     */
+    fastify.post("/tabs/close-others", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("workspace:close-others");
+        reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
 
     /**
      * Goes to the next tab if there is one.
