@@ -3,6 +3,7 @@
  * in Obsidian.
  */
 import { FastifyInstance } from "fastify";
+import { MarkdownView, WorkspaceLeaf } from "obsidian";
 import { IContextService } from "src/context";
 
 export default class EditorHandler {
@@ -51,5 +52,83 @@ export default class EditorHandler {
         reply.status(500).send({ error: err.message });
       }
     });
+
+    fastify.post<{
+      Body: {
+        line: number;
+        ch: number;
+      };
+      Reply: {
+        filepath?: string;
+        error?: string;
+      };
+    }>(
+      "/open-link",
+      {
+        schema: {
+          body: {
+            type: "object",
+            required: ["line", "ch"],
+            properties: {
+              line: { type: "number" },
+              ch: { type: "number" },
+            },
+          },
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      async (request, reply) => {
+        try {
+          const { line, ch } = request.body;
+
+          const editor = this.context.editor;
+          if (!editor) {
+            throw new Error("No active editor found.");
+          }
+
+          // moves the cursor to the specified position
+          editor.setCursor({ line, ch });
+
+          // executes the command to follow the link
+          this.context.app.commands.executeCommandById("editor:follow-link");
+
+          // gets the opened file path
+          const filepath = await new Promise<string>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error("Navigation timeout."));
+              this.context.workspace.off("active-leaf-change", handler);
+            }, 1000); // Optional safety timeout
+
+            const handler = (leaf: WorkspaceLeaf) => {
+              const view = leaf.view;
+              if (view instanceof MarkdownView) {
+                clearTimeout(timeout);
+                this.context.workspace.off("active-leaf-change", handler);
+                resolve(view.file?.path ?? "");
+              }
+            };
+
+            this.context.workspace.on("active-leaf-change", handler);
+          });
+
+          reply.status(200).send({ filepath });
+        } catch (err) {
+          reply.status(500).send({ error: err.message });
+        }
+      },
+    );
   };
 }

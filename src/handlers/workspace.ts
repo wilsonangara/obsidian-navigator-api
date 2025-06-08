@@ -56,7 +56,6 @@ export default class WorkspaceHandler {
         const { filepath } = request.body;
 
         try {
-          console.log(filepath, "FILEPATH");
           // opens file based on the filepath.
           await this.context.workspace.openLinkText(filepath, "/", false);
 
