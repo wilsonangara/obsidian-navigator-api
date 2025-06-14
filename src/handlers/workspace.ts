@@ -3,7 +3,6 @@
  * in Obsidian.
  */
 import { FastifyInstance } from "fastify";
-import { MarkdownView } from "obsidian";
 import { IContextService } from "src/context";
 
 export default class WorkspaceHandler {
@@ -127,6 +126,17 @@ export default class WorkspaceHandler {
       try {
         this.context.app.commands.executeCommandById("workspace:previous-tab");
         reply.status(204).send();
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
+
+    /**
+     * Opens graph view.
+     */
+    fastify.post("/graph", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("graph:open");
       } catch (err) {
         reply.status(500).send({ error: err.message });
       }
