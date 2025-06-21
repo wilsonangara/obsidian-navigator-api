@@ -5,6 +5,7 @@
 
 import { FastifyInstance } from "fastify";
 import { IContextService } from "src/context";
+import { getCurrentFilepath } from "./utils";
 
 export default class DailyNotesHandler {
   private context: IContextService;
@@ -17,37 +18,112 @@ export default class DailyNotesHandler {
     /**
      * Opens today's daily note.
      */
-    fastify.post("/today", async (request, reply) => {
-      try {
-        this.context.app.commands.executeCommandById("daily-notes");
-        reply.status(204).send();
-      } catch (err) {
-        reply.status(500).send({ error: err.message });
-      }
-    });
+    fastify.post(
+      "/today",
+      {
+        schema: {
+          body: {},
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      async (request, reply) => {
+        try {
+          this.context.app.commands.executeCommandById("daily-notes");
+
+          const filepath = await getCurrentFilepath(this.context);
+
+          reply.status(200).send({ filepath });
+        } catch (err) {
+          reply.status(500).send({ error: err.message });
+        }
+      },
+    );
 
     /**
      * Opens next daily notes.
      */
-    fastify.post("/next", async (request, reply) => {
-      try {
-        this.context.app.commands.executeCommandById("daily-notes:goto-next");
-        reply.status(204).send();
-      } catch (err) {
-        reply.status(500).send({ error: err.message });
-      }
-    });
+    fastify.post(
+      "/next",
+      {
+        schema: {
+          body: {},
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      async (request, reply) => {
+        try {
+          this.context.app.commands.executeCommandById("daily-notes:goto-next");
+
+          const filepath = await getCurrentFilepath(this.context);
+
+          reply.status(200).send({ filepath });
+        } catch (err) {
+          reply.status(500).send({ error: err.message });
+        }
+      },
+    );
 
     /**
      * Opens previous daily notes.
      */
-    fastify.post("/prev", async (request, reply) => {
-      try {
-        this.context.app.commands.executeCommandById("daily-notes:goto-prev");
-        reply.status(204).send();
-      } catch (err) {
-        reply.status(500).send({ error: err.message });
-      }
-    });
+    fastify.post(
+      "/prev",
+      {
+        schema: {
+          body: {},
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      async (request, reply) => {
+        try {
+          this.context.app.commands.executeCommandById("daily-notes:goto-prev");
+
+          const filepath = await getCurrentFilepath(this.context);
+
+          reply.status(200).send({ filepath });
+        } catch (err) {
+          reply.status(500).send({ error: err.message });
+        }
+      },
+    );
   };
 }

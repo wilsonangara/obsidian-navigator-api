@@ -3,8 +3,8 @@
  * in Obsidian.
  */
 import { FastifyInstance } from "fastify";
-import { MarkdownView, WorkspaceLeaf } from "obsidian";
 import { IContextService } from "src/context";
+import { getCurrentFilepath } from "./utils";
 
 export default class EditorHandler {
   private context: IContextService;
@@ -106,23 +106,7 @@ export default class EditorHandler {
           this.context.app.commands.executeCommandById("editor:follow-link");
 
           // gets the opened file path
-          const filepath = await new Promise<string>((resolve, reject) => {
-            const timeout = setTimeout(() => {
-              reject(new Error("Navigation timeout."));
-              this.context.workspace.off("active-leaf-change", handler);
-            }, 1000); // Optional safety timeout
-
-            const handler = (leaf: WorkspaceLeaf) => {
-              const view = leaf.view;
-              if (view instanceof MarkdownView) {
-                clearTimeout(timeout);
-                this.context.workspace.off("active-leaf-change", handler);
-                resolve(view.file?.path ?? "");
-              }
-            };
-
-            this.context.workspace.on("active-leaf-change", handler);
-          });
+          const filepath = await getCurrentFilepath(this.context);
 
           reply.status(200).send({ filepath });
         } catch (err) {
