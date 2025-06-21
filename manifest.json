@@ -1,7 +1,7 @@
 {
   "id": "navigator-api",
   "name": "Navigator API",
-  "version": "0.12.0",
+  "version": "0.12.3",
   "minAppVersion": "1.8.10",
   "description": "This plugin provides a way to navigate through the Obsidian Vault using the Obsidian API exposed by REST API.",
   "author": "Wilson Angara",
