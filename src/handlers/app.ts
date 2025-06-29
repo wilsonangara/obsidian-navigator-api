@@ -88,5 +88,29 @@ export default class AppHandler {
         }
       },
     );
+
+    /**
+     * Navigate forward to next view.
+     */
+    fastify.post("/navigate-forward", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("app:go-forward");
+        reply.status(204);
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
+
+    /**
+     * Navigate back to previous view.
+     */
+    fastify.post("/navigate-back", async (request, reply) => {
+      try {
+        this.context.app.commands.executeCommandById("app:go-back");
+        reply.status(204);
+      } catch (err) {
+        reply.status(500).send({ error: err.message });
+      }
+    });
   };
 }
