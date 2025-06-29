@@ -61,6 +61,8 @@ export default class EditorHandler {
       Body: {
         line: number;
         ch: number;
+        newLeaf: boolean;
+        newWindow: boolean;
       };
       Reply: {
         filepath?: string;
@@ -76,6 +78,8 @@ export default class EditorHandler {
             properties: {
               line: { type: "number" },
               ch: { type: "number" },
+              newLeaf: { type: "boolean", default: false },
+              newWindow: { type: "boolean", default: false },
             },
           },
           response: {
@@ -106,8 +110,20 @@ export default class EditorHandler {
           // moves the cursor to the specified position
           editor.setCursor({ line, ch });
 
-          // executes the command to follow the link
-          this.context.app.commands.executeCommandById("editor:follow-link");
+          const app = this.context.app;
+          switch (true) {
+            case request.body.newLeaf:
+              app.commands.executeCommandById("editor:open-link-in-new-leaf");
+              break;
+            case request.body.newWindow:
+              app.commands.executeCommandById("editor:open-link-in-new-window");
+              break;
+            default:
+              this.context.app.commands.executeCommandById(
+                "editor:follow-link",
+              );
+              break;
+          }
 
           // gets the opened file path
           const filepath = await getCurrentFilepath(this.context);
