@@ -53,6 +53,10 @@ export default class EditorHandler {
       }
     });
 
+    /**
+     * Navigates to a link under the cursor position at a given time. Will throw
+     * an error if there is no link under the cursor position.
+     */
     fastify.post<{
       Body: {
         line: number;
