@@ -4,6 +4,7 @@
 import { Command } from "obsidian";
 import { FastifyInstance } from "fastify";
 import { IContextService } from "src/context";
+import { getCurrentFilepath } from "./utils";
 
 declare module "obsidian" {
   interface App {
@@ -92,22 +93,75 @@ export default class AppHandler {
     /**
      * Navigate forward to next view.
      */
-    fastify.post("/navigate-forward", async (request, reply) => {
-      try {
-        this.context.app.commands.executeCommandById("app:go-forward");
-        reply.status(204);
-      } catch (err) {
-        reply.status(500).send({ error: err.message });
-      }
-    });
+    fastify.post(
+      "/navigate-forward",
+      {
+        schema: {
+          body: {},
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      async (request, reply) => {
+        try {
+          this.context.app.commands.executeCommandById("app:go-forward");
+
+          // defaults to empty string if no file is open
+          let filepath = "";
+          filepath = await getCurrentFilepath(this.context);
+
+          reply.status(200).send({ filepath });
+        } catch (err) {
+          reply.status(500).send({ error: err.message });
+        }
+      },
+    );
 
     /**
      * Navigate back to previous view.
      */
-    fastify.post("/navigate-back", async (request, reply) => {
+    fastify.post(
+        "/navigate-back",
+              {
+        schema: {
+          body: {},
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                filepath: { type: "string" },
+              },
+            },
+            500: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+        async (request, reply) => {
       try {
         this.context.app.commands.executeCommandById("app:go-back");
-        reply.status(204);
+
+        // defaults to empty string if no file is open
+        let filepath = "";
+        filepath = await getCurrentFilepath(this.context);
+
+        reply.status(200).send({ filepath });
       } catch (err) {
         reply.status(500).send({ error: err.message });
       }
